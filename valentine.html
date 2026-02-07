@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine?</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rose-red: #c41e3a;
+            --deep-burgundy: #4a1520;
+            --soft-pink: #ffd6e0;
+            --cream: #fffef9;
+            --gold: #d4af37;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--soft-pink) 100%);
+            color: var(--deep-burgundy);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Floating petals background */
+        .petal {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: var(--rose-red);
+            opacity: 0.3;
+            border-radius: 50% 0% 50% 0%;
+            animation: float 15s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .petal:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 12s; }
+        .petal:nth-child(2) { left: 30%; animation-delay: 2s; animation-duration: 14s; }
+        .petal:nth-child(3) { left: 50%; animation-delay: 4s; animation-duration: 16s; }
+        .petal:nth-child(4) { left: 70%; animation-delay: 1s; animation-duration: 13s; }
+        .petal:nth-child(5) { left: 90%; animation-delay: 3s; animation-duration: 15s; }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { 
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Canvas container */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100vh;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* Content sections */
+        .content-section {
+            position: relative;
+            z-index: 3;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 2rem;
+            padding-left: 5%;
+            padding-right: 52%;
+        }
+
+        .hero {
+            flex-direction: column;
+            text-align: left;
+            align-items: flex-start;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 8vw, 7rem);
+            font-weight: 900;
+            color: var(--rose-red);
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 20px rgba(196, 30, 58, 0.3);
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .hero p {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-weight: 300;
+            color: var(--deep-burgundy);
+            max-width: 600px;
+            margin: 0 0 2rem 0;
+            animation: fadeInUp 1.2s ease-out 0.3s both;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 5%;
+            font-size: 0.9rem;
+            color: var(--rose-red);
+            animation: bounce 2s infinite, fadeInUp 1.2s ease-out 0.6s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .message-section {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(74, 21, 32, 0.15);
+            animation: fadeIn 1s ease-out;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .message-photo {
+            position: absolute;
+            bottom: -80px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            border-radius: 15px;
+            border: 4px solid white;
+            box-shadow: 0 10px 30px rgba(74, 21, 32, 0.2);
+            background: linear-gradient(135deg, var(--soft-pink), var(--rose-red));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            animation: fadeIn 1s ease-out 0.3s both;
+        }
+
+        .message-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: var(--rose-red);
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .message-section p {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            line-height: 1.8;
+            color: var(--deep-burgundy);
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .answer-section {
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 700;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .yes-btn {
+            background: linear-gradient(135deg, var(--rose-red), #e74c3c);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .yes-btn:hover {
+            transform: scale(1.1) rotate(-2deg);
+            box-shadow: 0 15px 40px rgba(196, 30, 58, 0.4);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 10px 30px rgba(196, 30, 58, 0.3);
+            }
+            50% {
+                box-shadow: 0 15px 45px rgba(196, 30, 58, 0.5);
+            }
+        }
+
+        .no-btn {
+            background: var(--cream);
+            color: var(--deep-burgundy);
+            border: 2px solid var(--rose-red);
+        }
+
+        .no-btn:hover {
+            background: var(--soft-pink);
+            transform: scale(0.95);
+        }
+
+        .celebration {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(196, 30, 58, 0.95);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .celebration.active {
+            display: flex;
+        }
+
+        .celebration h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 900;
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: 1rem;
+            animation: celebrationBounce 1s ease-out;
+        }
+        .message-photo img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .celebration p {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: white;
+            text-align: center;
+            max-width: 600px;
+            animation: celebrationBounce 1s ease-out 0.2s both;
+        }
+
+        @keyframes celebrationBounce {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) rotate(-10deg);
+            }
+            50% {
+                transform: scale(1.1) rotate(5deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        /* Hearts explosion */
+        .heart {
+            position: fixed;
+            font-size: 30px;
+            color: var(--gold);
+            animation: heartFloat 3s ease-out forwards;
+            pointer-events: none;
+            z-index: 1001;
+        }
+
+        @keyframes heartFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-300px) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-600px) scale(0.5);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-section {
+                padding: 1.5rem;
+                justify-content: center;
+                padding-right: 1.5rem;
+            }
+
+            .message-section {
+                padding: 2rem 1.5rem;
+            }
+
+            .message-photo {
+                width: 120px;
+                height: 120px;
+                bottom: -70px;
+                right: 15px;
+                font-size: 2.5rem;
+            }
+
+            button {
+                padding: 1rem 2rem;
+            }
+
+            .button-container {
+                gap: 1rem;
+            }
+
+            #canvas-container {
+                width: 100%;
+                opacity: 0.5;
+            }
+
+            .hero {
+                align-items: center;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating petals -->
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+
+    <!-- Three.js canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Hero section -->
+    <div class="content-section hero">
+        <h1>Will You Be<br>My Valentine?</h1>
+        <div class="scroll-indicator">↓ Scroll ↓</div>
+    </div>
+
+    <!-- Message section 1 -->
+    <div class="content-section">
+        <div class="message-section">
+            <h2>A Rose For You</h2>
+            <p>This rose unfurls with each petal, my love for you grows.</p>
+            <div class="message-photo">
+                <img src="2.jpeg" alt="">
+            </div>
+        </div>
+    </div>
+
+    <!-- Message section 2 -->
+    <div class="content-section">
+        <div class="message-section">
+            <h2>Every Petal</h2>
+            <p>Count the petals, for each petal is day in our love.</p>
+            <p>Watch as they bloom, just like our love blossoms with time</p>
+            <div class="message-photo">
+                <img src="1.jpeg" alt="">
+            </div>
+        </div>
+    </div>
+
+    <!-- Message section 3 -->
+    <div class="content-section">
+        <div class="message-section">
+            <h2>A Love That Grows</h2>
+            <p>Your smile lights up my darkest days, and your love fills my heart.</p>
+            <p>Your kindness, your laughter, you. Are all I need</p>
+            <div class="message-photo">
+                <img src="3.jpeg" alt="">
+            </div>
+        </div>
+    </div>
+
+    <!-- Message section 4 -->
+    <div class="content-section">
+        <div class="message-section">
+            <h2>This Valentine's Day</h2>
+            <p>I want to spend it with you</p>
+            <p>FYI, I love you, so every valentine I want to spend it with you.</p>
+            <div class="message-photo"><img src="4.jpeg" alt=""></div>
+        </div>
+    </div>
+
+    <!-- Question section -->
+    <div class="content-section answer-section">
+        <div class="message-section">
+            <h2>So, what do you say?</h2>
+            <div class="button-container">
+                <button class="yes-btn" onclick="sayYes()">
+                    <span>Yes! 💕</span>
+                </button>
+                <button class="no-btn" onclick="sayNo(this)">
+                    <span>NO (Dont click).</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration overlay -->
+    <div class="celebration" id="celebration">
+        <h2>Yes! 🎉</h2>
+        <p>Your rose is being delivered shortly! ❤️</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Three.js Scene Setup
+        const scene = new THREE.Scene();
+        const isMobile = window.innerWidth <= 768;
+        const containerWidth = isMobile ? window.innerWidth : window.innerWidth * 0.5;
+        const camera = new THREE.PerspectiveCamera(75, containerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(containerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        camera.position.z = 5;
+        camera.position.x = 0;
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const pointLight1 = new THREE.PointLight(0xff4466, 1, 100);
+        pointLight1.position.set(5, 5, 5);
+        scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0xffccdd, 0.8, 100);
+        pointLight2.position.set(-5, -5, 5);
+        scene.add(pointLight2);
+
+        // Create Rose
+        const roseGroup = new THREE.Group();
+
+        // Stem
+        const stemGeometry = new THREE.CylinderGeometry(0.05, 0.08, 3, 8);
+        const stemMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0x2d5016,
+            shininess: 30
+        });
+        const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+        stem.position.y = -1.5;
+        roseGroup.add(stem);
+
+        // Leaves
+        const createLeaf = (x, y, rotation) => {
+            const leafShape = new THREE.Shape();
+            leafShape.moveTo(0, 0);
+            leafShape.quadraticCurveTo(0.3, 0.2, 0.5, 0);
+            leafShape.quadraticCurveTo(0.3, -0.2, 0, 0);
+            
+            const leafGeometry = new THREE.ShapeGeometry(leafShape);
+            const leafMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x3d7018,
+                side: THREE.DoubleSide,
+                shininess: 50
+            });
+            const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+            leaf.position.set(x, y, 0);
+            leaf.rotation.z = rotation;
+            return leaf;
+        };
+
+        roseGroup.add(createLeaf(0.1, -1, 0.3));
+        roseGroup.add(createLeaf(-0.1, -1.5, -0.3));
+
+        // Rose petals - removed shared material
+
+        const petals = [];
+        const petalCount = 20;
+        
+        for (let i = 0; i < petalCount; i++) {
+            const petalShape = new THREE.Shape();
+            const width = 0.8 - (i * 0.02);
+            const height = 1.2 - (i * 0.03);
+            
+            petalShape.moveTo(0, 0);
+            petalShape.quadraticCurveTo(width, height * 0.3, width, height);
+            petalShape.quadraticCurveTo(width * 0.7, height * 1.1, 0, height * 0.9);
+            petalShape.quadraticCurveTo(-width * 0.7, height * 1.1, -width, height);
+            petalShape.quadraticCurveTo(-width, height * 0.3, 0, 0);
+            
+            const petalGeometry = new THREE.ShapeGeometry(petalShape);
+            // Each petal gets its own material for independent color control
+            const petalMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xffffff,
+                side: THREE.DoubleSide,
+                shininess: 60
+            });
+            const petal = new THREE.Mesh(petalGeometry, petalMaterial);
+            
+            const angle = (i / petalCount) * Math.PI * 2;
+            const radius = 0.2 + (i * 0.04);
+            const layer = Math.floor(i / 5);
+            
+            petal.position.x = Math.cos(angle) * radius;
+            petal.position.z = Math.sin(angle) * radius;
+            petal.position.y = 0.2 - (layer * 0.1);
+            
+            petal.rotation.y = angle + Math.PI / 2;
+            petal.rotation.x = Math.PI / 2 - (i * 0.05);
+            
+            // Initial closed state
+            petal.scale.set(0.1, 0.1, 0.1);
+            petal.userData.targetScale = 1;
+            petal.userData.initialRotationX = petal.rotation.x;
+            petal.userData.targetRotationX = petal.rotation.x - Math.PI / 6;
+            
+            petals.push(petal);
+            roseGroup.add(petal);
+        }
+
+        scene.add(roseGroup);
+        roseGroup.rotation.x = -0.2;
+        roseGroup.rotation.y = -0.3;
+
+        // Scroll-based animation
+        let scrollProgress = 0;
+
+        function updateRose() {
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            scrollProgress = Math.min(window.scrollY / maxScroll, 1);
+            
+            // Color transition from white to red
+            const white = { r: 1, g: 1, b: 1 };
+            const red = { r: 0.77, g: 0.12, b: 0.23 }; // #c41e3a
+            
+            const r = white.r + (red.r - white.r) * scrollProgress;
+            const g = white.g + (red.g - white.g) * scrollProgress;
+            const b = white.b + (red.b - white.b) * scrollProgress;
+            
+            petals.forEach((petal, index) => {
+                const delay = index / petalCount;
+                const petalProgress = Math.max(0, Math.min(1, (scrollProgress - delay * 0.3) / 0.7));
+                
+                // Smooth easing
+                const eased = petalProgress * petalProgress * (3 - 2 * petalProgress);
+                
+                petal.scale.setScalar(0.1 + eased * 0.9);
+                petal.rotation.x = petal.userData.initialRotationX + 
+                    (petal.userData.targetRotationX - petal.userData.initialRotationX) * eased;
+                
+                // Update color
+                petal.material.color.setRGB(r, g, b);
+            });
+
+            // Rotate rose to face reader more as we scroll
+            roseGroup.rotation.y = -0.3 + (scrollProgress * Math.PI * 0.4);
+        }
+
+        window.addEventListener('scroll', updateRose);
+        updateRose();
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Gentle floating
+            roseGroup.position.y = Math.sin(Date.now() * 0.001) * 0.1;
+            
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            const isMobile = window.innerWidth <= 768;
+            const containerWidth = isMobile ? window.innerWidth : window.innerWidth * 0.5;
+            camera.aspect = containerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(containerWidth, window.innerHeight);
+        });
+
+        // Interactive functions
+        function sayYes() {
+            const celebration = document.getElementById('celebration');
+            celebration.classList.add('active');
+            
+            // Create heart explosion
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    heart.textContent = '❤️';
+                    heart.style.left = Math.random() * 100 + '%';
+                    heart.style.top = '100%';
+                    document.body.appendChild(heart);
+                    
+                    setTimeout(() => heart.remove(), 3000);
+                }, i * 100);
+            }
+        }
+
+        function sayNo(btn) {
+            const responses = [
+                "Well too bad! 😜",,
+                "You can't escape this! 😈",
+                "Think about it... 💭",
+                "The rose is so pretty though! 🌹",
+                "Pretty please? 🙏",
+                "One more chance? ✨",
+                "You know you want to say yes! 💝",
+                "I already trapped you hehe 😁",
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            btn.querySelector('span').textContent = randomResponse;
+            
+            // Make yes button bigger
+            const yesBtn = document.querySelector('.yes-btn');
+            const currentScale = parseFloat(yesBtn.style.transform?.match(/scale\(([\d.]+)\)/)?.[1] || 1);
+            yesBtn.style.transform = `scale(${currentScale + 0.1})`;
+        }
+    </script>
+</body>
+</html>
